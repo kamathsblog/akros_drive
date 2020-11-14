@@ -37,7 +37,7 @@ class ServoConvert():
         #print self.id, self.value_out
         return(self.value_out)
 
-class LowLevelCtrl():
+class DriveAckermann():
     def __init__(self):
 
         rospy.init_node('drive_ackermann')
@@ -48,7 +48,9 @@ class LowLevelCtrl():
             center_steering = rospy.get_param('/drive/center_steering')
             rospy.loginfo("[ACK] Loaded config paramters: /drive")
         else:
-            rospy.logerr("[ACK] Config parameter not found: /drive")
+            center_throttle = 333;
+            center_steering = 333;
+            rospy.logerr("[ACK] Config parameter not found: /drive, center_throttle/steering set to 333")
                     
         self.actuators = {}
         self.actuators['throttle']  = ServoConvert(id=1, center_value = center_throttle, center_range = 9)
@@ -120,5 +122,5 @@ class LowLevelCtrl():
             rate.sleep()
 
 if __name__ == "__main__":
-    llc = LowLevelCtrl()
-    llc.run()
+    jetracer2 = DriveAckermann()
+    jetracer2.run()
