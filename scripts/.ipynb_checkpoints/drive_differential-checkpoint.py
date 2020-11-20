@@ -18,6 +18,7 @@ class DriveDifferential():
         if rospy.has_param('/drive'):
             self.max_pwm = rospy.get_param('/drive/max_pwm')
             self.k_speed = rospy.get_param('/drive/k_speed')
+            self.k_angular = rospy.get_param('/drive/k_angular')
             rospy.loginfo("[DFF] Loaded config paramters: /drive")
         else:
             rospy.logerr("[DFF] Config parameter not found: /drive")
@@ -53,8 +54,8 @@ class DriveDifferential():
 
         rospy.loginfo("[DFF] Received command: Linear = %2.1f , Angular = %2.1f"%(msg.linear.x, msg.angular.z))
         
-        lmotor_speed = self.k_speed*(msg.linear.x - 0.5*msg.angular.z)
-        rmotor_speed = self.k_speed*(msg.linear.x + 0.5*msg.angular.z)
+        lmotor_speed = self.k_speed*(msg.linear.x - 0.5*self.k_angular*msg.angular.z)
+        rmotor_speed = self.k_speed*(msg.linear.x + 0.5*self.k_angular*msg.angular.z)
             
         self.send_motor_msg(self.motor_left_ID,  lmotor_speed)
         self.send_motor_msg(self.motor_right_ID,  rmotor_speed)

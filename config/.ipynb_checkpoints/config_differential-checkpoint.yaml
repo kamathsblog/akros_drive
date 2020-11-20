@@ -1,1 +1,1 @@
-drive: {max_pwm: 150, k_speed: 1.0}
+drive: {max_pwm: 150, k_speed: 1.0, k_angular: 1.0}
