@@ -16,7 +16,8 @@ class DriveDifferential():
         rospy.loginfo("[DFF] Differential Drive application initialized")
         
         if rospy.has_param('/drive'):
-            max_speed = rospy.get_param('/drive/max_speed')
+            self.max_pwm = rospy.get_param('/drive/max_pwm')
+            self.k_speed = rospy.get_param('/drive/k_speed')
             rospy.loginfo("[DFF] Loaded config paramters: /drive")
         else:
             rospy.logerr("[DFF] Config parameter not found: /drive")
@@ -29,55 +30,38 @@ class DriveDifferential():
         self.motor_right = motor_driver.getMotor(self.motor_right_ID)
         rospy.loginfo("[DFF] Actuators initialized")
 
-        rospy.Subscriber('~cmd_str', String, self.set_actuators_from_cmdstr)
-        rospy.loginfo("[DFF] String Subscriber initialized")
+        #--- Create the Subscriber to Twist commands
+        self.ros_sub_twist = rospy.Subscriber("/cmd_vel", Twist, self.set_actuators_from_cmdvel)
+        rospy.loginfo("[DFF] Twist Subscriber initialized")
         
-        #self._dcmotor_msg = ServoArray()
-        #for i in range(2): self._servo_msg.servos.append(Servo())
-        #--- Create the servo array publisher
+        #--- Create the motor array publisher if needed
         #self.ros_pub_servo_array = rospy.Publisher("/servos_absolute", ServoArray, queue_size=1)
         #rospy.loginfo("[ACK] Servo Publisher initialized")
 
-        #--- Create the Subscriber to Twist commands
-        #self.ros_sub_twist = rospy.Subscriber("/cmd_vel", Twist, self.set_actuators_from_cmdvel)
-        #rospy.loginfo("[ACK] Twist Subscriber initialized")
-
         #--- Get the last time e got a commands
         self._last_time_cmd_rcv = time.time()
-        self._timeout_s = 5
+        self._timeout_s = 3
 
         rospy.loginfo("[DFF] Initialization complete")
         
-    def set_actuators_from_cmdstr(self, msg):
+    def set_actuators_from_cmdvel(self, msg):
         """
         Get a message from cmd_vel, assuming a maximum input of 1
         """
         #-- Save the time
         self._last_time_cmd_rcv = time.time()
 
-        rospy.loginfo(rospy.get_caller_id() + ' cmd_str=%s', msg.data)
-        #rospy.loginfo("[ACK] Received command: Linear = %2.1f , Angular = %2.1f"%(message.linear.x, message.angular.z))
-
-        if msg.data.lower() == "left":
-            self.send_motor_msg(self.motor_left_ID,  -1.0)
-            self.send_motor_msg(self.motor_right_ID,  1.0) 
-        elif msg.data.lower() == "right":
-            self.send_motor_msg(self.motor_left_ID,   1.0)
-            self.send_motor_msg(self.motor_right_ID, -1.0) 
-        elif msg.data.lower() == "forward":
-            self.send_motor_msg(self.motor_left_ID,   1.0)
-            self.send_motor_msg(self.motor_right_ID,  1.0)
-        elif msg.data.lower() == "backward":
-            self.send_motor_msg(self.motor_left_ID,  -1.0)
-            self.send_motor_msg(self.motor_right_ID, -1.0)  
-        elif msg.data.lower() == "stop":
-            self.set_actuator_idle()
-        else:
-            rospy.logerror(rospy.get_caller_id() + ' invalid cmd_str=%s', msg.data)
+        rospy.loginfo("[ACK] Received command: Linear = %2.1f , Angular = %2.1f"%(msg.linear.x, msg.angular.z))
+        
+        lmotor_speed = self.k_speed*(msg.linear.x - 0.5*msg.angular.z)
+        rmotor_speed = self.k_speed*(msg.linear.x + 0.5*msg.angular.z)
+            
+        self.send_motor_msg(self.motor_left_ID,  lmotor_speed)
+        self.send_motor_msg(self.motor_right_ID,  rmotor_speed)
         
     # sets motor speed between [-1.0, 1.0]
     def send_motor_msg(self, motor_ID, value):
-        max_pwm = 115.0
+        max_pwm = self.max_pwm
         speed = int(min(max(abs(value * max_pwm), 0), max_pwm))
 
         if motor_ID == 1:
@@ -94,10 +78,10 @@ class DriveDifferential():
 
         if value > 0:
             motor.run(Adafruit_MotorHAT.FORWARD)
-            rospy.loginfo("[DFF] Sending PWM signal: %s Motor Speed = %d"%(m_name, speed))
+            rospy.loginfo("[DFF] Sending PWM: %s Motor = %d"%(m_name, speed))
         else:
             motor.run(Adafruit_MotorHAT.BACKWARD)
-            rospy.loginfo("[DFF] Sending PWM signal: %s Motor Speed = %d"%(m_name, -1*speed))
+            rospy.loginfo("[DFF] Sending PWM: %s Motor = %d"%(m_name, -1*speed))
                                                                
     def set_actuators_idle(self):
         self.motor_left.setSpeed(0)
@@ -114,7 +98,7 @@ class DriveDifferential():
     def run(self):
 
         #--- Set the control rate
-        rate = rospy.Rate(50)
+        rate = rospy.Rate(500)
 
         while not rospy.is_shutdown():
             #print self._last_time_cmd_rcv, self.is_controller_connected
