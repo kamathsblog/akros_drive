@@ -40,7 +40,7 @@ class DriveDifferential():
 
         #--- Get the last time e got a commands
         self._last_time_cmd_rcv = time.time()
-        self._timeout_s = 3
+        self._timeout_s = 5
 
         rospy.loginfo("[DFF] Initialization complete")
         
@@ -51,7 +51,7 @@ class DriveDifferential():
         #-- Save the time
         self._last_time_cmd_rcv = time.time()
 
-        rospy.loginfo("[ACK] Received command: Linear = %2.1f , Angular = %2.1f"%(msg.linear.x, msg.angular.z))
+        rospy.loginfo("[DFF] Received command: Linear = %2.1f , Angular = %2.1f"%(msg.linear.x, msg.angular.z))
         
         lmotor_speed = self.k_speed*(msg.linear.x - 0.5*msg.angular.z)
         rmotor_speed = self.k_speed*(msg.linear.x + 0.5*msg.angular.z)
@@ -98,7 +98,7 @@ class DriveDifferential():
     def run(self):
 
         #--- Set the control rate
-        rate = rospy.Rate(500)
+        rate = rospy.Rate(1000)
 
         while not rospy.is_shutdown():
             #print self._last_time_cmd_rcv, self.is_controller_connected
