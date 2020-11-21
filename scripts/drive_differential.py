@@ -52,7 +52,7 @@ class DriveDifferential():
         #-- Save the time
         self._last_time_cmd_rcv = time.time()
 
-        rospy.loginfo("[DFF] Received command: Linear = %2.1f , Angular = %2.1f"%(msg.linear.x, msg.angular.z))
+        #rospy.loginfo("[DFF] Received command: Linear = %2.1f , Angular = %2.1f"%(msg.linear.x, msg.angular.z))
         
         lmotor_speed = self.k_speed*(msg.linear.x - 0.5*self.k_angular*msg.angular.z)
         rmotor_speed = self.k_speed*(msg.linear.x + 0.5*self.k_angular*msg.angular.z)
@@ -79,10 +79,10 @@ class DriveDifferential():
 
         if value > 0:
             motor.run(Adafruit_MotorHAT.FORWARD)
-            rospy.loginfo("[DFF] Sending PWM: %s Motor = %d"%(m_name, speed))
+            #rospy.loginfo("[DFF] Sending PWM: %s Motor = %d"%(m_name, speed))
         else:
             motor.run(Adafruit_MotorHAT.BACKWARD)
-            rospy.loginfo("[DFF] Sending PWM: %s Motor = %d"%(m_name, -1*speed))
+            #rospy.loginfo("[DFF] Sending PWM: %s Motor = %d"%(m_name, -1*speed))
                                                                
     def set_actuators_idle(self):
         self.motor_left.setSpeed(0)
