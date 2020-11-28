@@ -6,7 +6,6 @@ Class for the low level control of a 2-wheeled differential drive robot - assume
 import rospy
 from Adafruit_MotorHAT import Adafruit_MotorHAT
 from geometry_msgs.msg import Twist
-from std_msgs.msg import String
 import time
 
 class DriveDifferential():
@@ -31,8 +30,8 @@ class DriveDifferential():
         self.motor_right = motor_driver.getMotor(self.motor_right_ID)
         rospy.loginfo("[DFF] Actuators initialized")
 
-        #--- Create the Subscriber to Twist commands
-        self.ros_sub_twist = rospy.Subscriber("/cmd_vel", Twist, self.set_actuators_from_cmdvel)
+        #--- Create the Subscriber to read Twist commands
+        self.ros_sub_twist = rospy.Subscriber("/cmd_vel", Twist, self.set_actuators_from_cmdvel, queue_size=1)
         rospy.loginfo("[DFF] Twist Subscriber initialized")
         
         #--- Create the motor array publisher if needed
@@ -67,10 +66,10 @@ class DriveDifferential():
 
         if motor_ID == 1:
             motor = self.motor_left
-            m_name = "L"
+            #m_name = "L"
         elif motor_ID == 2:
             motor = self.motor_right
-            m_name = "R"
+            #m_name = "R"
         else:
             rospy.logerror('[DFF] set_speed(%d, %f) -> invalid motor_ID=%d', motor_ID, value, motor_ID)
             return

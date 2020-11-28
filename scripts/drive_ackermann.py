@@ -64,7 +64,7 @@ class DriveAckermann():
         self.ros_pub_servo_array = rospy.Publisher("/servos_absolute", ServoArray, queue_size=1)
         rospy.loginfo("[ACK] Servo Publisher initialized")
 
-        #--- Create the Subscriber to Twist commands
+        #--- Create the Subscriber to read Twist commands
         self.ros_sub_twist = rospy.Subscriber("/cmd_vel", Twist, self.set_actuators_from_cmdvel)
         rospy.loginfo("[ACK] Twist Subscriber initialized")
 
