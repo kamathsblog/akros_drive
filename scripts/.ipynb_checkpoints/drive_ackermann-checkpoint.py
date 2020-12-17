@@ -1,7 +1,16 @@
 #!/usr/bin/python
 
 """
-Class for the low level control of a 4wd car with Ackermann steering - with a DC motor for throttle and a servo motor for steering. It assumes ros-12cpwmboard has been installed.
+==========
+ROS node to drive an ackermann steering car (Jetracer2) from twist messages. It assumes ros-i2cpwmboard has been installed
+This code implements the following functionality:
+  > Subscribes to twist messages
+  > Configures the i2cpwm_board using parameters loaded onto the parameter server
+  > Sets output values for the servos, publishes it as an array
+Modified by Aditya Kamath
+adityakamath.github.io
+github.com/adityakamath
+==========
 """
 import rospy
 from i2cpwm_board.msg import Servo, ServoArray

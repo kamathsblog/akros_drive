@@ -1,7 +1,16 @@
 #!/usr/bin/python
 
 """
-Class for the low level control of a 2-wheeled differential drive robot - assumes that the Adafruit MotorHat libraries have already been installed
+==========
+ROS node to drive a differential drive robot (Jetbot2) from twist messages. It assumes Adafruit MotorHat libraries have already been installed
+This code implements the following functionality:
+  > Subscribes to twist messages
+  > Configures the open loop controller based on the parameters from the parameter server
+  > Sets output PWM values for the motors, option to publish it as an array (see drive_ackermann.py)
+by Aditya Kamath
+adityakamath.github.io
+github.com/adityakamath
+==========
 """
 import rospy
 from Adafruit_MotorHAT import Adafruit_MotorHAT

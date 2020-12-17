@@ -1,0 +1,12 @@
+<launch>
+    
+<!-- Load config files -->
+<rosparam command="load" file="$(find akros_drive)/config/config_differential.yaml" />
+
+<!-- Launch AKROS Drive (Differential) node -->
+<node pkg="akros_drive" type="drive_differential.py" name="drive_node" output="screen">
+    <remap from="/cmd_vel" to="/switch_node/cmd_vel" />
+    <!-- remap from="/servos_absolute" to="/i2cpwm_node/servos_absolute" / -->
+</node>
+
+</launch>
