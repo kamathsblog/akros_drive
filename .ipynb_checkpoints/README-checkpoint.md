@@ -20,4 +20,4 @@ The Differential script does not publish any topic, although it can be modified 
 ### Launch
 For each script, a launch file is provided:
 * drive_ackermann.launch: `roslaunch akros_drive drive_ackermann.launch`
-* drive_differential.launch `roslaunch akros_drive drive_differential.launch`
+* drive_differential.launch: `roslaunch akros_drive drive_differential.launch`
