@@ -45,7 +45,7 @@ class DriveDifferential():
         rospy.loginfo("[DFF] Twist Subscriber initialized")
         
         #--- Create the Subscriber to read IMU data
-        self.ros_sub_imu = rospy.Subscriber("/imu_node/imu", Imu, self.imu_sub_callback, queue_size=1)
+        self.ros_sub_imu = rospy.Subscriber("/imu", Imu, self.imu_sub_callback, queue_size=1)
         self.imu_msg = Imu()
         rospy.loginfo("[DFF] IMU Subscriber initialized")
         
