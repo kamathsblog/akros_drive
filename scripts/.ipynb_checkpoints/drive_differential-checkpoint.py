@@ -15,6 +15,7 @@ github.com/adityakamath
 import rospy
 from Adafruit_MotorHAT import Adafruit_MotorHAT
 from geometry_msgs.msg import Twist
+from sensor_msgs.msg import Imu
 import time
 
 class DriveDifferential():
@@ -43,6 +44,11 @@ class DriveDifferential():
         self.ros_sub_twist = rospy.Subscriber("/cmd_vel", Twist, self.set_actuators_from_cmdvel, queue_size=1)
         rospy.loginfo("[DFF] Twist Subscriber initialized")
         
+        #--- Create the Subscriber to read IMU data
+        self.ros_sub_imu = rospy.Subscriber("/imu_node/imu", Imu, self.imu_sub_callback, queue_size=1)
+        self.imu_msg = Imu()
+        rospy.loginfo("[DFF] IMU Subscriber initialized")
+        
         #--- Create the motor array publisher if needed
         #self.ros_pub_servo_array = rospy.Publisher("/servos_absolute", ServoArray, queue_size=1)
         #rospy.loginfo("[ACK] Servo Publisher initialized")
@@ -59,7 +65,9 @@ class DriveDifferential():
         """
         #-- Save the time
         self._last_time_cmd_rcv = time.time()
-
+        
+        ## rospy.loginfo("[DFF] cmd_anglev: %f   measured_anglev: %f" %(msg.angular.z, self.imu_msg.angular_velocity.z))
+        ## ADD PID CONTROLLER HERE
         #rospy.loginfo("[DFF] Received command: Linear = %2.1f , Angular = %2.1f"%(msg.linear.x, msg.angular.z))
         
         lmotor_speed = self.k_speed*(msg.linear.x - 0.5*self.k_angular*msg.angular.z)
@@ -68,6 +76,9 @@ class DriveDifferential():
         self.send_motor_msg(self.motor_left_ID,  lmotor_speed)
         self.send_motor_msg(self.motor_right_ID,  rmotor_speed)
         
+    def imu_sub_callback(self, msg):
+        self.imu_msg = msg
+
     # sets motor speed between [-1.0, 1.0]
     def send_motor_msg(self, motor_ID, value):
         max_pwm = self.max_pwm
