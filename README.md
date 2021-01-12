@@ -1,4 +1,4 @@
-# akros_drive
+# akros_drive update
 
 ### Description
 ROS node to drive the AKROS Differential (Jetbot2) and Ackermann (Jetracer2/ROSCar) platforms at a particular linear and angular velocity. The following Python scripts are provided:
